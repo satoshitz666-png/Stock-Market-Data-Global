@@ -1,0 +1,604 @@
+import React, { useState, useEffect } from "react";
+import {
+  LayoutDashboard,
+  Globe,
+  TrendingUp,
+  Activity,
+  Shield,
+  Users,
+  DollarSign,
+  Zap,
+  Settings,
+  Bell,
+  Search,
+  ArrowUpRight,
+  ArrowDownRight,
+  Menu,
+  X,
+  ChevronRight,
+  RefreshCw,
+  AlertTriangle,
+  BarChart3,
+  PieChart,
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+} from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
+
+// --- LOGO URL ---
+const LOGO_URL = "https://image.qwenlm.ai/public_source/60694ff8-6458-4eeb-8fca-55a6258b4ab1/1d66b8bcf-681b-47d4-a492-2e4569af1907.png";
+
+// --- TRANSLATION DATA ---
+const TRANSLATIONS = {
+  en: {
+    brand: "PreMarket",
+    subtitle: "AI Decision Engine for US Stocks",
+    dashboard: "Dashboard",
+    globalMarkets: "Global Markets",
+    portfolio: "Portfolio & P&L",
+    riskControl: "Rebalancing & Risk",
+    system: "System Settings",
+    totalUsers: "Total Users",
+    activePredictions: "Active Predictions",
+    revenue: "Revenue",
+    apiCalls: "API Calls",
+    signals: "AI Signals",
+    marketScan: "Top 10 Market Scan",
+    portfolioTitle: "Portfolio Performance",
+    riskTitle: "Risk Management",
+    stopLoss: "Stop Loss Trigger",
+    cutLoss: "Cut Loss Mode",
+    autoRebalance: "Auto Rebalance",
+    bearMarketAlert: "Bear Market Alert",
+    buy: "BUY",
+    sell: "SELL",
+    hold: "HOLD",
+    confidence: "Confidence",
+    reasoning: "Reasoning",
+    signal: "Signal",
+    entry: "Entry Price",
+    target: "Target",
+    stop: "Stop Loss",
+    viewAll: "View All",
+    marketUS: "US Market",
+    marketUK: "UK Market",
+    marketHK: "HK Market",
+    marketSG: "SG Market",
+    marketGER: "Germany",
+    marketIND: "India",
+    marketKOR: "Korea",
+    marketJPN: "Japan",
+    marketCHN: "China",
+    marketFRA: "France",
+    pnl: "Profit & Loss",
+    volume: "Volume",
+    trend: "Trend",
+  },
+  id: {
+    brand: "PreMarket",
+    subtitle: "Mesin Keputusan AI untuk Saham AS",
+    dashboard: "Dasbor",
+    globalMarkets: "Pasar Global",
+    portfolio: "Portofolio & L/R",
+    riskControl: "Rebalancing & Risiko",
+    system: "Pengaturan Sistem",
+    totalUsers: "Total Pengguna",
+    activePredictions: "Prediksi Aktif",
+    revenue: "Pendapatan",
+    apiCalls: "Panggilan API",
+    signals: "Sinyal AI",
+    marketScan: "Pemindaian 10 Pasar Teratas",
+    portfolioTitle: "Performa Portofolio",
+    riskTitle: "Manajemen Risiko",
+    stopLoss: "Pemicu Stop Loss",
+    cutLoss: "Mode Cut Loss",
+    autoRebalance: "Rebalance Otomatis",
+    bearMarketAlert: "Peringatan Bear Market",
+    buy: "BELI",
+    sell: "JUAL",
+    hold: "TAHAN",
+    confidence: "Kepercayaan",
+    reasoning: "Analisis",
+    signal: "Sinyal",
+    entry: "Harga Masuk",
+    target: "Target",
+    stop: "Stop Loss",
+    viewAll: "Lihat Semua",
+    marketUS: "Pasar AS",
+    marketUK: "Pasar Inggris",
+    marketHK: "Pasar Hong Kong",
+    marketSG: "Pasar Singapura",
+    marketGER: "Jerman",
+    marketIND: "India",
+    marketKOR: "Korea",
+    marketJPN: "Jepang",
+    marketCHN: "Tiongkok",
+    marketFRA: "Prancis",
+    pnl: "Laba Rugi",
+    volume: "Volume",
+    trend: "Tren",
+  },
+};
+
+// --- MOCK DATA ---
+const MOCK_PORTFOLIO = [
+  { date: "01 May", pnl: 12000 },
+  { date: "05 May", pnl: 14500 },
+  { date: "10 May", pnl: 13800 },
+  { date: "15 May", pnl: 16200 },
+  { date: "20 May", pnl: 15500 },
+  { date: "25 May", pnl: 18900 },
+  { date: "30 May", pnl: 21000 },
+];
+
+const MOCK_MARKETS = [
+  { id: 1, name: "US Market", code: "US", index: "S&P 500", value: "5,234.12", change: "+1.2%", trend: "up", flag: "🇸" },
+  { id: 2, name: "UK Market", code: "UK", index: "FTSE 100", value: "8,102.50", change: "-0.4%", trend: "down", flag: "🇬🇧" },
+  { id: 3, name: "HK Market", code: "HK", index: "HSI", value: "18,200.40", change: "+2.1%", trend: "up", flag: "🇭🇰" },
+  { id: 4, name: "SG Market", code: "SG", index: "STI", value: "3,210.10", change: "+0.2%", trend: "up", flag: "🇸🇬" },
+  { id: 5, name: "Germany", code: "GER", index: "DAX", value: "17,400.00", change: "-0.8%", trend: "down", flag: "🇩🇪" },
+  { id: 6, name: "India", code: "IND", index: "NIFTY", value: "22,100.30", change: "+1.5%", trend: "up", flag: "🇮🇳" },
+  { id: 7, name: "Korea", code: "KOR", index: "KOSPI", value: "2,600.50", change: "+0.9%", trend: "up", flag: "🇰🇷" },
+  { id: 8, name: "Japan", code: "JPN", index: "NIKKEI", value: "38,500.20", change: "-0.3%", trend: "down", flag: "🇯🇵" },
+  { id: 9, name: "China", code: "CHN", index: "SSE", value: "3,050.00", change: "+1.8%", trend: "up", flag: "🇨🇳" },
+  { id: 10, name: "France", code: "FRA", index: "CAC 40", value: "7,900.10", change: "+0.1%", trend: "up", flag: "🇫🇷" },
+];
+
+const MOCK_SIGNALS = [
+  { id: 1, ticker: "NVDA", type: "buy", conf: 92, entry: "950.00", target: "1100.00", stop: "900.00", reason: "Strong momentum, AI chip demand surge." },
+  { id: 2, ticker: "TSLA", type: "hold", conf: 65, entry: "180.00", target: "220.00", stop: "160.00", reason: "Sideways consolidation, waiting for volume." },
+  { id: 3, ticker: "AAPL", type: "sell", conf: 88, entry: "190.00", target: "160.00", stop: "195.00", reason: "Overbought RSI, bearish divergence detected." },
+  { id: 4, ticker: "MSFT", type: "buy", conf: 85, entry: "420.00", target: "450.00", stop: "400.00", reason: "Cloud revenue growth beating expectations." },
+  { id: 5, ticker: "META", type: "buy", conf: 78, entry: "480.00", target: "520.00", stop: "460.00", reason: "User engagement metrics improving." },
+];
+
+// --- COMPONENTS ---
+
+const StatCard = ({ title, value, sub, icon: Icon, color }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+  >
+    <div className="flex justify-between items-start">
+      <div>
+        <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
+        <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+        <p className={`text-xs font-medium mt-2 ${sub > 0 ? "text-emerald-500" : "text-red-500"}`}>
+          {sub > 0 ? "+" : ""}{sub}% from last month
+        </p>
+      </div>
+      <div className={`p-3 rounded-lg ${color}`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+    </div>
+  </motion.div>
+);
+
+const SignalCard = ({ item, t }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="bg-white p-4 rounded-xl border border-slate-100 flex flex-col gap-3 hover:border-sky-200 transition-colors"
+  >
+    <div className="flex justify-between items-center">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white
+          ${item.type === "buy" ? "bg-emerald-500" : item.type === "sell" ? "bg-rose-500" : "bg-slate-400"}`}>
+          {item.type === "buy" ? "B" : item.type === "sell" ? "S" : "H"}
+        </div>
+        <div>
+          <h4 className="font-bold text-slate-800">{item.ticker}</h4>
+          <p className="text-xs text-slate-500">US Stock</p>
+        </div>
+      </div>
+      <div className={`px-3 py-1 rounded-full text-xs font-bold
+        ${item.type === "buy" ? "bg-emerald-100 text-emerald-700" : item.type === "sell" ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600"}`}>
+        {t[item.type]}
+      </div>
+    </div>
+    <div className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg">
+      "{item.reason}"
+    </div>
+    <div className="flex justify-between text-xs text-slate-500 border-t border-slate-100 pt-3">
+      <span>{t.confidence}: <span className="font-bold text-slate-800">{item.conf}%</span></span>
+      <span>{t.entry}: ${item.entry}</span>
+      <span>{t.stop}: ${item.stop}</span>
+    </div>
+  </motion.div>
+);
+
+const MarketCard = ({ market }) => (
+  <div className="bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between hover:shadow-sm transition-all cursor-pointer group">
+    <div className="flex items-center gap-3">
+      <span className="text-2xl">{market.flag}</span>
+      <div>
+        <p className="font-bold text-slate-800 group-hover:text-sky-600 transition-colors">{market.name}</p>
+        <p className="text-xs text-slate-500">{market.index}</p>
+      </div>
+    </div>
+    <div className="text-right">
+      <p className="font-mono font-medium text-slate-800">{market.value}</p>
+      <p className={`text-xs font-medium ${market.trend === "up" ? "text-emerald-500" : "text-rose-500"}`}>
+        {market.change}
+      </p>
+    </div>
+  </div>
+);
+
+// --- MAIN APP ---
+
+export default function App() {
+  const [lang, setLang] = useState("en");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const t = TRANSLATIONS[lang];
+
+  const toggleLang = () => setLang((prev) => (prev === "en" ? "id" : "en"));
+
+  const navItems = [
+    { id: "dashboard", label: t.dashboard, icon: LayoutDashboard },
+    { id: "markets", label: t.globalMarkets, icon: Globe },
+    { id: "portfolio", label: t.portfolio, icon: PieChart },
+    { id: "risk", label: t.riskControl, icon: Shield },
+    { id: "system", label: t.system, icon: Settings },
+  ];
+
+  return (
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden">
+      {/* Sidebar */}
+      <aside
+        className={`${isSidebarOpen ? "w-64" : "w-20"} bg-white border-r border-slate-100 flex flex-col transition-all duration-300 z-20 shadow-sm`}
+      >
+        <div className="p-6 flex items-center gap-3 justify-center border-b border-slate-100">
+          <img src={LOGO_URL} alt="PreMarket" className="h-8 object-contain" />
+          <div className={`${!isSidebarOpen && "hidden"} flex flex-col`}>
+            <span className="font-bold text-slate-900 leading-tight">PreMarket</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider">SuperAdmin</span>
+          </div>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all
+                ${activeTab === item.id
+                  ? "bg-sky-50 text-sky-600 font-semibold shadow-sm"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                }`}
+            >
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              {isSidebarOpen && <span>{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-100">
+          <div className={`flex items-center gap-3 p-3 rounded-xl bg-slate-50 ${!isSidebarOpen && "justify-center"}`}>
+            <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold text-xs">
+              SA
+            </div>
+            {isSidebarOpen && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800 truncate">Super Admin</p>
+                <p className="text-xs text-slate-400 truncate">admin@premarket.ai</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Header */}
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 z-10">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-500">
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search ticker, user, or signal..."
+                className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 w-64 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 hover:bg-slate-100 rounded-lg text-slate-500">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
+            </button>
+            <button
+              onClick={toggleLang}
+              className="px-3 py-1.5 bg-slate-100 hover:bg-sky-100 text-slate-600 hover:text-sky-600 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <Globe className="w-4 h-4" />
+              {lang === "en" ? "EN" : "ID"}
+            </button>
+          </div>
+        </header>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
+          <div className="max-w-7xl mx-auto space-y-8">
+            {/* Page Title */}
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">{t[activeTab] || t.dashboard}</h1>
+              <p className="text-slate-500 mt-1">{t.subtitle}</p>
+            </div>
+
+            {/* --- DASHBOARD TAB --- */}
+            {activeTab === "dashboard" && (
+              <>
+                {/* KPI Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <StatCard title={t.totalUsers} value="12,450" sub={12} icon={Users} color="bg-sky-500" />
+                  <StatCard title={t.activePredictions} value="856" sub={5} icon={Zap} color="bg-emerald-500" />
+                  <StatCard title={t.revenue} value="$42,890" sub={18} icon={DollarSign} color="bg-violet-500" />
+                  <StatCard title={t.apiCalls} value="1.2M" sub={-2} icon={Activity} color="bg-rose-500" />
+                </div>
+
+                {/* Charts & Signals */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Portfolio Chart */}
+                  <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-slate-800">{t.portfolioTitle}</h3>
+                      <div className="flex gap-2">
+                        <span className="px-3 py-1 bg-sky-50 text-sky-600 text-xs rounded-full font-medium">Live</span>
+                      </div>
+                    </div>
+                    <div className="h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={MOCK_PORTFOLIO}>
+                          <defs>
+                            <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 12 }} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 12 }} />
+                          <Tooltip
+                            contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="pnl"
+                            stroke="#0ea5e9"
+                            strokeWidth={3}
+                            fillOpacity={1}
+                            fill="url(#colorPnl)"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Recent Signals */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-slate-800">{t.signals}</h3>
+                      <button className="text-xs text-sky-600 hover:underline">{t.viewAll}</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
+                      {MOCK_SIGNALS.map((signal) => (
+                        <SignalCard key={signal.id} item={signal} t={t} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Market Mini Grid */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="font-bold text-slate-800">{t.marketScan}</h3>
+                    <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400">
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {MOCK_MARKETS.map((market) => (
+                      <MarketCard key={market.id} market={market} />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* --- MARKETS TAB --- */}
+            {activeTab === "markets" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {MOCK_MARKETS.map((market) => (
+                  <motion.div key={market.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:border-sky-300 transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="text-4xl">{market.flag}</span>
+                      <div>
+                        <h3 className="font-bold text-lg text-slate-800">{market.name}</h3>
+                        <p className="text-sm text-slate-500">{market.index}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 text-sm">Current Value</span>
+                        <span className="font-mono font-bold text-slate-800">{market.value}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 text-sm">24h Change</span>
+                        <span className={`font-medium ${market.trend === "up" ? "text-emerald-500" : "text-rose-500"}`}>
+                          {market.change}
+                        </span>
+                      </div>
+                      <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${market.trend === "up" ? "bg-emerald-400" : "bg-rose-400"}`}
+                          style={{ width: `${Math.abs(parseFloat(market.change)) * 40}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <button className="w-full mt-4 py-2 bg-slate-50 hover:bg-sky-50 text-slate-600 hover:text-sky-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                      Analyze <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            {/* --- PORTFOLIO TAB --- */}
+            {activeTab === "portfolio" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <p className="text-slate-500 text-sm mb-1">Total Equity</p>
+                    <h3 className="text-3xl font-bold text-slate-800">$1,240,500</h3>
+                    <p className="text-emerald-500 text-sm mt-2 font-medium">+5.2% this week</p>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <p className="text-slate-500 text-sm mb-1">Open Positions</p>
+                    <h3 className="text-3xl font-bold text-slate-800">14</h3>
+                    <p className="text-slate-400 text-sm mt-2">Across 6 sectors</p>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <p className="text-slate-500 text-sm mb-1">Available Cash</p>
+                    <h3 className="text-3xl font-bold text-slate-800">$45,000</h3>
+                    <p className="text-slate-400 text-sm mt-2">Ready for rebalancing</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                  <h3 className="font-bold text-slate-800 mb-6">Asset Allocation</h3>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[
+                        { name: "Tech", val: 40 },
+                        { name: "Health", val: 20 },
+                        { name: "Finance", val: 15 },
+                        { name: "Energy", val: 10 },
+                        { name: "Cons", val: 10 },
+                        { name: "Other", val: 5 },
+                      ]} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                        <XAxis type="number" hide />
+                        <YAxis dataKey="name" type="category" width={80} tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }} />
+                        <Bar dataKey="val" radius={[0, 4, 4, 0]} barSize={20}>
+                          {[40, 20, 15, 10, 10, 5].map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#0ea5e9" : "#10b981"} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* --- RISK CONTROL TAB --- */}
+            {activeTab === "risk" && (
+              <div className="space-y-6">
+                <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 bg-rose-100 rounded-lg text-rose-600">
+                      <Shield className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-800">{t.riskTitle}</h3>
+                      <p className="text-slate-500 text-sm">Configure automatic risk management parameters</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8">
+                    {/* Stop Loss Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <div>
+                        <h4 className="font-bold text-slate-800">{t.stopLoss}</h4>
+                        <p className="text-sm text-slate-500">Automatically sell if position drops below threshold</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-500"></div>
+                      </label>
+                    </div>
+
+                    {/* Cut Loss Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <div>
+                        <h4 className="font-bold text-slate-800">{t.cutLoss}</h4>
+                        <p className="text-sm text-slate-500">Hard liquidation on severe market downturns</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                      </label>
+                    </div>
+
+                    {/* Sliders */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-medium text-slate-700">Bear Market Threshold</span>
+                          <span className="text-sm font-bold text-sky-600">-5%</span>
+                        </div>
+                        <input type="range" className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500" />
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-medium text-slate-700">Max Portfolio Drawdown</span>
+                          <span className="text-sm font-bold text-rose-600">10%</span>
+                        </div>
+                        <input type="range" className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500" />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                      <p className="text-sm text-amber-800">
+                        <strong>Warning:</strong> Adjusting these parameters will affect all active AI trading positions immediately.
+                      </p>
+                    </div>
+
+                    <button className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-lg shadow-sky-200 transition-all">
+                      Save Configuration
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* --- SYSTEM TAB --- */}
+            {activeTab === "system" && (
+              <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center h-96">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                  <Settings className="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">System Settings</h3>
+                <p className="text-slate-500 max-w-md">
+                  Manage API keys, rate limits, database connections, and user permissions here.
+                </p>
+                <button className="mt-6 px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors">
+                  Open Console
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
