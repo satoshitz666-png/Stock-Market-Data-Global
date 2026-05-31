@@ -1,0 +1,14 @@
+premarket-ai/
+│
+├── app/
+│   ├── main.py
+│   ├── database.py
+│   ├── models/
+│   ├── schemas/
+│   ├── routers/
+│   ├── services/
+│   ├── ai/
+│   └── utils/
+│
+├── requirements.txt
+└── .env
