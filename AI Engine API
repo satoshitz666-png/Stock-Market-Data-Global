@@ -1,0 +1,30 @@
+# app/ai/recommendation.py
+import random
+
+def generate_signal(price):
+    if price > 180:
+        return "BUY"
+    else:
+        return "SELL"
+
+def confidence_score():
+    return round(random.uniform(0.7, 0.95), 2)
+
+# app/routers/ai.py
+from fastapi import APIRouter
+from app.ai.recommendation import generate_signal, confidence_score
+
+router = APIRouter()
+
+@router.get("/recommendation")
+def get_recommendation(symbol: str, price: float):
+    signal = generate_signal(price)
+
+    return {
+        "symbol": symbol,
+        "recommendation": signal,
+        "confidence": confidence_score(),
+        "entry_price": price,
+        "target_price": price * 1.1,
+        "stop_loss": price * 0.95
+    }
