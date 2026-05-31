@@ -1,0 +1,24 @@
+# services/yahoo.py
+import requests
+
+def get_yahoo_quote(symbol: str):
+    url = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbol}"
+    
+    res = requests.get(url)
+    data = res.json()
+
+    quote = data["quoteResponse"]["result"][0]
+
+    return {
+        "symbol": quote["symbol"],
+        "price": quote["regularMarketPrice"],
+        "currency": quote.get("currency"),
+        "timestamp": quote["regularMarketTime"],
+        "open": quote.get("regularMarketOpen"),
+        "high": quote.get("regularMarketDayHigh"),
+        "low": quote.get("regularMarketDayLow"),
+        "volume": quote.get("regularMarketVolume"),
+        "change": quote.get("regularMarketChange"),
+        "change_percent": quote.get("regularMarketChangePercent"),
+        "source": "yahoo"
+    }
