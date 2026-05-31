@@ -1,0 +1,14 @@
+backend/
+├── app/
+│   ├── main.py
+│   ├── routers/
+│   │    └── market.py
+│   ├── services/
+│   │    ├── yahoo.py
+│   │    ├── bloomberg.py
+│   │    ├── aggregator.py
+│   ├── core/
+│   │    ├── cache.py
+│   │    ├── config.py
+│   ├── models/
+│   │    └── market.py
