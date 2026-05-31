@@ -1,0 +1,21 @@
+# routers/market.py
+from fastapi import APIRouter
+from services.aggregator import get_market_data
+from core.cache import get_cache, set_cache
+
+router = APIRouter()
+
+@router.get("/market/{symbol}")
+def market(symbol: str):
+
+    cache_key = f"market:{symbol}"
+    
+    cached = get_cache(cache_key)
+    if cached:
+        return cached
+
+    data = get_market_data(symbol)
+    
+    set_cache(cache_key, data, ttl=10)
+    
+    return data
