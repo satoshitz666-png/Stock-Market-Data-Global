@@ -1,0 +1,91 @@
+-- USERS
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100),
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role VARCHAR(20) DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- SUBSCRIPTIONS
+CREATE TABLE subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    plan_type VARCHAR(50),
+    status VARCHAR(20),
+    start_date TIMESTAMP,
+    end_date TIMESTAMP
+);
+
+-- MARKET DATA
+CREATE TABLE market_data (
+    id BIGSERIAL PRIMARY KEY,
+    symbol VARCHAR(20),
+    exchange VARCHAR(20),
+    market VARCHAR(10),
+    price_open FLOAT,
+    price_high FLOAT,
+    price_low FLOAT,
+    price_close FLOAT,
+    volume BIGINT,
+    timestamp TIMESTAMP,
+    source VARCHAR(50)
+);
+
+-- FUNDAMENTALS
+CREATE TABLE fundamentals (
+    id BIGSERIAL PRIMARY KEY,
+    symbol VARCHAR(20),
+    pe_ratio FLOAT,
+    eps FLOAT,
+    market_cap BIGINT,
+    revenue BIGINT,
+    net_income BIGINT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- AI RECOMMENDATIONS
+CREATE TABLE ai_recommendations (
+    id BIGSERIAL PRIMARY KEY,
+    symbol VARCHAR(20),
+    recommendation VARCHAR(10),
+    confidence_score FLOAT,
+    entry_price FLOAT,
+    target_price FLOAT,
+    stop_loss FLOAT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- PORTFOLIO
+CREATE TABLE portfolio (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    symbol VARCHAR(20),
+    quantity FLOAT,
+    avg_price FLOAT
+);
+
+-- TRANSACTIONS
+CREATE TABLE transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    symbol VARCHAR(20),
+    action VARCHAR(10),
+    price FLOAT,
+    quantity FLOAT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- BACKTEST RESULTS
+CREATE TABLE backtest_results (
+    id BIGSERIAL PRIMARY KEY,
+    strategy_name VARCHAR(100),
+    symbol VARCHAR(20),
+    total_return FLOAT,
+    annual_return FLOAT,
+    max_drawdown FLOAT,
+    sharpe_ratio FLOAT,
+    win_rate FLOAT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
