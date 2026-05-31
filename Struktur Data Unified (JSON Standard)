@@ -1,0 +1,13 @@
+{
+  "symbol": "AAPL",
+  "price": 189.32,
+  "currency": "USD",
+  "timestamp": "2026-05-31T12:00:00Z",
+  "source": "yahoo",
+  "open": 187.10,
+  "high": 190.00,
+  "low": 186.50,
+  "volume": 58293000,
+  "change": 2.22,
+  "change_percent": 1.18
+}
