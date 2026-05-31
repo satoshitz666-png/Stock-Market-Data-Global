@@ -1,0 +1,12 @@
+# services/aggregator.py
+from services.yahoo import get_yahoo_quote
+from services.bloomberg import get_bloomberg_quote
+
+def get_market_data(symbol: str):
+
+    try:
+        data = get_yahoo_quote(symbol)
+        return data
+    except Exception:
+        # fallback ke Bloomberg
+        return get_bloomberg_quote(symbol)
