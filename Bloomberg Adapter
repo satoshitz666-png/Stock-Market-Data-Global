@@ -1,0 +1,18 @@
+# services/bloomberg.py
+
+def get_bloomberg_quote(symbol: str):
+    # Simulasi / wrapper jika pakai Bloomberg Terminal API
+    
+    return {
+        "symbol": symbol,
+        "price": 189.50,
+        "currency": "USD",
+        "timestamp": "2026-05-31T12:00:00Z",
+        "open": 187.00,
+        "high": 190.20,
+        "low": 186.80,
+        "volume": 58000000,
+        "change": 2.40,
+        "change_percent": 1.28,
+        "source": "bloomberg"
+    }
