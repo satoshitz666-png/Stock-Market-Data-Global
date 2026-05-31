@@ -1,0 +1,13 @@
+# app/routers/market.py
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/data")
+def get_market_data(symbol: str):
+    # Placeholder (integrasi Yahoo/Bloomberg)
+    return {
+        "symbol": symbol,
+        "price": 190.5,
+        "source": "yahoo_finance"
+    }
