@@ -1,0 +1,14 @@
+Client (Dashboard / API Consumer)
+        ↓
+API Gateway (FastAPI / NestJS)
+        ↓
+Market Data Service
+   ├── Yahoo Adapter
+   ├── Bloomberg Adapter (mock / enterprise API)
+   ├── Data Normalizer
+   ├── Cache Layer (Redis)
+   └── Fallback Engine
+        ↓
+Database (PostgreSQL + Timeseries)
+        ↓
+Streaming (Kafka / WebSocket)
