@@ -1,0 +1,48 @@
+3.6 Main App
+# main.py
+from fastapi import FastAPI
+from routers import market
+
+app = FastAPI()
+
+app.include_router(market.router)
+
+4. Database (Timeseries Optimized)
+CREATE TABLE market_data (
+    id SERIAL PRIMARY KEY,
+    symbol VARCHAR(10),
+    price NUMERIC,
+    currency VARCHAR(10),
+    timestamp TIMESTAMP,
+    source VARCHAR(20),
+    volume BIGINT,
+    change NUMERIC,
+    change_percent NUMERIC
+);
+
+CREATE INDEX idx_symbol_time ON market_data(symbol, timestamp DESC);
+
+5. WebSocket (Real-time Streaming)
+# websocket example
+from fastapi import WebSocket
+
+@app.websocket("/ws/{symbol}")
+async def websocket_endpoint(ws: WebSocket, symbol: str):
+    await ws.accept()
+    
+    while True:
+        data = get_market_data(symbol)
+        await ws.send_json(data)
+
+6. Frontend Consumption (Next.js)
+// fetch API
+const res = await fetch("/api/market/AAPL")
+const data = await res.json()
+
+// websocket
+const ws = new WebSocket("ws://localhost:8000/ws/AAPL")
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  console.log(data)
+}
