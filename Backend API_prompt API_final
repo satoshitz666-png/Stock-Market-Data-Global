@@ -1,0 +1,27 @@
+// app/api/prompt/route.ts
+import { pool } from "@/lib/db";
+import { generateAI } from "@/lib/openai";
+
+export async function POST(req: Request) {
+  const { userId, prompt } = await req.json();
+
+  const user = await pool.query("SELECT * FROM users WHERE id=$1", [userId]);
+
+  if (user.rows[0].credits <= 0) {
+    return Response.json({ error: "No credits left" });
+  }
+
+  const aiOutput = await generateAI(prompt);
+
+  await pool.query(
+    "INSERT INTO prompts (user_id, input, output) VALUES ($1, $2, $3)",
+    [userId, prompt, aiOutput]
+  );
+
+  await pool.query(
+    "UPDATE users SET credits = credits - 1 WHERE id=$1",
+    [userId]
+  );
+
+  return Response.json({ result: aiOutput });
+}
