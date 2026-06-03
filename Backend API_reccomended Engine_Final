@@ -1,0 +1,12 @@
+// app/api/recommendation/route.ts
+export async function GET() {
+  const mock = {
+    symbol: "AAPL",
+    action: "BUY",
+    target_price: 210,
+    stop_loss: 180,
+    confidence: 0.87
+  };
+
+  return Response.json(mock);
+}
