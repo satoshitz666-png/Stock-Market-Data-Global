@@ -1,0 +1,7 @@
+CREATE TABLE market_data_cache (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  symbol TEXT,
+  data JSONB,
+  source TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
