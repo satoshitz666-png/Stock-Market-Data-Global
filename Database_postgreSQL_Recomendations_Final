@@ -1,0 +1,9 @@
+CREATE TABLE recommendations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  symbol TEXT,
+  action TEXT, -- BUY / SELL / HOLD
+  target_price NUMERIC,
+  stop_loss NUMERIC,
+  confidence NUMERIC,
+  created_at TIMESTAMP DEFAULT NOW()
+);
