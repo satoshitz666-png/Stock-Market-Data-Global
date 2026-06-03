@@ -1,0 +1,12 @@
+/app
+/api
+   /auth
+   /prompt
+   /recommendation
+   /market
+   /admin
+/lib
+   db.ts
+   openai.ts
+   yahoo.ts
+/middleware
