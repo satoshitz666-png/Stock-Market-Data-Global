@@ -1,0 +1,5 @@
+User → Next.js Dashboard → API Layer → 
+   → PostgreSQL (data)
+   → AI Engine (Python)
+   → External APIs (Yahoo Finance / etc)
+→ Response → UI / Export (PDF/Excel)
