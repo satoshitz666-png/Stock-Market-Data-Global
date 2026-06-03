@@ -1,0 +1,10 @@
+# ai-engine/model.py
+import pandas as pd
+
+def analyze_stock(data):
+    trend = data['close'].pct_change().mean()
+
+    if trend > 0:
+        return "BUY"
+    else:
+        return "SELL"
