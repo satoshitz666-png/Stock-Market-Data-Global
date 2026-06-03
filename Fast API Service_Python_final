@@ -1,0 +1,10 @@
+# main.py
+from fastapi import FastAPI
+from model import analyze_stock
+
+app = FastAPI()
+
+@app.post("/analyze")
+def analyze(payload: dict):
+    result = analyze_stock(payload["data"])
+    return {"recommendation": result}
