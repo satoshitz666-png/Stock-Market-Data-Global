@@ -1,0 +1,8 @@
+export default function Dashboard() {
+  return (
+    <div>
+      <h1>Premarket.ai Dashboard</h1>
+      <p>AI Stock Insights</p>
+    </div>
+  );
+}
